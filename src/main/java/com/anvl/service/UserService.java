@@ -38,10 +38,16 @@ public class UserService {
 		return ResponseEntity.ok(findByUserName);
 	}
 
-	public ResponseEntity<User> createUser(User user) {
-		User createdUser = userRepo.save(user);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdUser.getId())
-				.toUri();
+	public ResponseEntity<String> createUser(User user) {
+		URI location;
+		try {
+			User createdUser = userRepo.save(user);
+			location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+					.buildAndExpand(createdUser.getId()).toUri();
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError()
+					.body("Facing issue while creating user, Please try again later");
+		}
 		return ResponseEntity.created(location).build();
 	}
 
@@ -52,4 +58,28 @@ public class UserService {
 		}
 		return ResponseEntity.ok(findByUserId.get());
 	}
+
+	public ResponseEntity<String> updateUser(BigDecimal id, User user) {
+		URI location = null;
+		try {
+			Optional<User> optional = userRepo.findById(id);
+			User updatedUser = null;
+			if (optional.isEmpty()) {
+				return ResponseEntity.notFound().build();
+			} else {
+				updatedUser = optional.get();
+				updatedUser.setAddress(user.getAddress());
+				updatedUser.setEmail(user.getEmail());
+				updatedUser.setUserName(user.getUserName());
+				userRepo.save(updatedUser);
+			}
+			location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+					.buildAndExpand(updatedUser.getId()).toUri();
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError()
+					.body("Facing issue while updating user, Please try again later");
+		}
+		return ResponseEntity.ok().location(location).build();
+	}
+
 }
