@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,18 +28,13 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepo;
 
+	@Autowired
+	private MessageSource messageSource;
+
 	public ResponseEntity<List<User>> getUsers() {
 		return ResponseEntity.ok(userRepo.findAll());
 	}
-
-	public ResponseEntity<List<User>> getUserByName(String name) {
-		List<User> findByUserName = userRepo.findByUserName(name);
-		if (findByUserName.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(findByUserName);
-	}
-
+	
 	public ResponseEntity<String> createUser(User user) {
 		URI location;
 		try {
@@ -45,16 +42,19 @@ public class UserService {
 			location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 					.buildAndExpand(createdUser.getId()).toUri();
 		} catch (Exception e) {
-			return ResponseEntity.internalServerError()
-					.body("Facing issue while creating user, Please try again later");
+			return ResponseEntity.internalServerError().body(getMessage("user.create.exception.msg"));
 		}
 		return ResponseEntity.created(location).build();
 	}
 
-	public ResponseEntity<User> getUserById(BigDecimal id) {
+	private String getMessage(String property) {
+		return messageSource.getMessage(property, null, LocaleContextHolder.getLocale());
+	}
+
+	public ResponseEntity<Object> getUserById(BigDecimal id) {
 		Optional<User> findByUserId = userRepo.findById(id);
 		if (findByUserId.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
 		}
 		return ResponseEntity.ok(findByUserId.get());
 	}
@@ -65,7 +65,7 @@ public class UserService {
 			Optional<User> optional = userRepo.findById(id);
 			User updatedUser = null;
 			if (optional.isEmpty()) {
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
 			} else {
 				updatedUser = optional.get();
 				updatedUser.setAddress(user.getAddress());
@@ -76,8 +76,7 @@ public class UserService {
 			location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 					.buildAndExpand(updatedUser.getId()).toUri();
 		} catch (Exception e) {
-			return ResponseEntity.internalServerError()
-					.body("Facing issue while updating user, Please try again later");
+			return ResponseEntity.internalServerError().body(getMessage("user.update.exception.msg"));
 		}
 		return ResponseEntity.ok().location(location).build();
 	}

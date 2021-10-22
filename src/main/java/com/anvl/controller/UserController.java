@@ -36,7 +36,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<User> getUserById(@PathVariable BigDecimal id) {
+	public ResponseEntity<Object> getUserById(@PathVariable BigDecimal id) {
 		return userService.getUserById(id);
 	}
 
