@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,13 +42,13 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<String> createUser(@RequestBody User user) {
+	public ResponseEntity<String> createUser(@Validated @RequestBody User user) {
 		return userService.createUser(user);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<String> updateUser(@RequestBody User user,@PathVariable BigDecimal id) {
-		return userService.updateUser(id,user);
+	public ResponseEntity<String> updateUser(@Validated @RequestBody User user, @PathVariable BigDecimal id) {
+		return userService.updateUser(id, user);
 	}
 
 }

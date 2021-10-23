@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 
@@ -29,15 +30,17 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue
 	private BigDecimal id;
-	
-	@Email
+
 	@Column(name = "email")
+	@Email(message = "user.email.invalid.msg")
+	@NotBlank(message = "user.email.empty.msg")
 	private String email;
-	
+
 	@Column(name = "user_name")
+	@NotBlank(message = "user.name.empty.msg")
 	private String userName;
-	
+
 	@Column(name = "address")
 	private String address;
-	
+
 }
