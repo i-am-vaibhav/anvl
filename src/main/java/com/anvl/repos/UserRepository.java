@@ -4,7 +4,7 @@
 package com.anvl.repos;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,6 +16,6 @@ import com.anvl.entities.User;
  */
 public interface UserRepository extends JpaRepository<User, BigDecimal> {
 
-	List<User> findByUserName(String userName);
+	Optional<User> findByUserName(String userName);
 	
 }

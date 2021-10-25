@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,15 +28,16 @@ public class UserService {
 	private UserRepository userRepo;
 
 	@Autowired
-	private MessageSource messageSource;
+	private MessageService messageService;
 
 	public ResponseEntity<List<User>> getUsers() {
 		return ResponseEntity.ok(userRepo.findAll());
 	}
-	
+
 	public ResponseEntity<String> createUser(User user) {
 		URI location;
 		try {
+			user.setPassword("$2a$10$p3PHnpoBAnzZiL8mr3gMieMhVVSb585ajC2ZsBB0kwb4KvZKFSdNi");
 			User createdUser = userRepo.save(user);
 			location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 					.buildAndExpand(createdUser.getId()).toUri();
@@ -48,7 +48,7 @@ public class UserService {
 	}
 
 	private String getMessage(String property) {
-		return messageSource.getMessage(property, null, LocaleContextHolder.getLocale());
+		return messageService.getMsg(property, null, LocaleContextHolder.getLocale());
 	}
 
 	public ResponseEntity<Object> getUserById(BigDecimal id) {

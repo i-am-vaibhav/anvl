@@ -5,14 +5,23 @@ package com.anvl.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -36,11 +45,20 @@ public class User implements Serializable {
 	@NotBlank(message = "user.email.empty.msg")
 	private String email;
 
-	@Column(name = "user_name")
+	@Column(name = "user_name", unique = true)
 	@NotBlank(message = "user.name.empty.msg")
 	private String userName;
 
 	@Column(name = "address")
 	private String address;
+
+	@JsonIgnore
+	@Column(name = "password")
+	private String password;
+
+	@ManyToMany
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Role> roles;
 
 }
