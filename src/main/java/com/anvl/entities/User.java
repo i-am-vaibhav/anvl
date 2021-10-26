@@ -61,4 +61,9 @@ public class User implements Serializable {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Role> roles;
 
+	@ManyToMany
+	@JoinTable(name = "user_course", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Course> cources;
+
 }
