@@ -21,6 +21,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.anvl.service.MessageService;
 
+import io.jsonwebtoken.JwtException;
+
 /**
  * @author Vaibhav
  *
@@ -35,15 +37,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleException(Exception exception) {
 		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(new ExceptionResponse(exception.getLocalizedMessage(),
-						messageService.getMsg("internal.server.error.msg"), LocalDateTime.now()));
+						messageService.getMsg("internal.server.error.msg"), LocalDateTime.now().toString()));
 		return responseEntity;
 	}
-	
+
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<Object> handleException(UsernameNotFoundException exception) {
 		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
 				.body(new ExceptionResponse(messageService.getMsg("user.not.found.ex.msg"),
-						messageService.getMsg("authentication.failed"), LocalDateTime.now()));
+						messageService.getMsg("authentication.failed"), LocalDateTime.now().toString()));
 		return responseEntity;
 	}
 
@@ -55,7 +57,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		allErrors.forEach(error -> builder.append(messageService.getMsg(error.getDefaultMessage())).append(", "));
 		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(new ExceptionResponse(builder.toString(), messageService.getMsg("invalid.request.msg"),
-						LocalDateTime.now()));
+						LocalDateTime.now().toString()));
 		return responseEntity;
 	}
 
@@ -65,7 +67,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ExceptionResponse(
 						messageService.getMsg("method.argument.type.exception.msg", ex.getRequiredType(),
 								ex.getRootCause().getLocalizedMessage()),
-						messageService.getMsg("invalid.request.msg"), LocalDateTime.now()));
+						messageService.getMsg("invalid.request.msg"), LocalDateTime.now().toString()));
 		return responseEntity;
 	}
 
@@ -73,7 +75,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handle(AuthenticationException ex) {
 		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(new ExceptionResponse(messageService.getMsg(ex.getLocalizedMessage()),
-						messageService.getMsg("authentication.failed"), LocalDateTime.now()));
+						messageService.getMsg("authentication.failed"), LocalDateTime.now().toString()));
+		return responseEntity;
+	}
+
+	@ExceptionHandler(JwtException.class)
+	public ResponseEntity<Object> handle(JwtException ex) {
+		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(new ExceptionResponse(messageService.getMsg(ex.getLocalizedMessage()),
+						messageService.getMsg("authentication.failed"), LocalDateTime.now().toString()));
 		return responseEntity;
 	}
 

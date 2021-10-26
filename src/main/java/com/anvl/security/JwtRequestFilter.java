@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -35,18 +36,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 		// JWT Token is in the form "ANVL token". Remove Bearer word and get only the
 		// Token
-		if (!request.getRequestURI().endsWith("/authenticate")) {
+		if (!request.getRequestURI().endsWith("/authenticate") && !request.getRequestURI().endsWith("/home")) {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("ANVL ")) {
 				jwtToken = requestTokenHeader.substring(5);
 				try {
 					username = jwtTokenUtil.getUserName(jwtToken);
 				} catch (IllegalArgumentException e) {
-					throw new JwtException("Unable to get JWT Token");
+					throw new JwtException("jwt.unable.ex.msg");
 				} catch (ExpiredJwtException e) {
-					throw new JwtException("JWT Token has expired");
+					throw new JwtException("jwt.token.expired.ex.msg");
+				} catch (MalformedJwtException e) {
+					throw new JwtException("jwt.token.invalid.ex.msg");
+				}catch (Exception e) {
+					throw new JwtException("jwt.token.invalid.ex.msg");
 				}
 			} else {
-				throw new JwtException("JWT Token does not begin with ANVL String");
+				throw new JwtException("jwt.not.begin.ex.msg");
 			}
 		}
 		// Once we get the token validate it.

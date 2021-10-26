@@ -1,7 +1,5 @@
 package com.anvl.exception;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,6 +9,6 @@ public class ExceptionResponse {
 
 	private String msg;
 	private String response;
-	private LocalDateTime timestamp;
+	private String timestamp;
 
 }

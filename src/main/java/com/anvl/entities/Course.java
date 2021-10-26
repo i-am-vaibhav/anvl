@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,9 +34,11 @@ public class Course implements Serializable {
 	@GeneratedValue
 	private BigDecimal id;
 
+	@NotBlank(message = "Name must not be empty")
 	@Column(name = "name")
 	private String name;
 
+	@NotBlank(message = "Description must not be empty")
 	@Column(name = "description")
 	private String description;
 

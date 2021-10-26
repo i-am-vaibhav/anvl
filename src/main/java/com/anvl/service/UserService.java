@@ -34,6 +34,14 @@ public class UserService {
 		return ResponseEntity.ok(userRepo.findAll());
 	}
 
+	public ResponseEntity<Object> getUserByName(String name) {
+		Optional<User> findByUserName = userRepo.findByUserName(name);
+		if (findByUserName.isEmpty()) {
+			return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
+		}
+		return ResponseEntity.ok(findByUserName.get());
+	}
+
 	public ResponseEntity<String> createUser(User user) {
 		URI location;
 		try {
@@ -79,6 +87,15 @@ public class UserService {
 			return ResponseEntity.internalServerError().body(getMessage("user.update.exception.msg"));
 		}
 		return ResponseEntity.ok().location(location).build();
+	}
+
+	public ResponseEntity<Object> getCoursesByUserId(BigDecimal id) {
+		Optional<User> findByUserId = userRepo.findById(id);
+		if (findByUserId.isEmpty()) {
+			return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
+		}
+		User user = findByUserId.get();
+		return ResponseEntity.ok(user.getCources());
 	}
 
 }
