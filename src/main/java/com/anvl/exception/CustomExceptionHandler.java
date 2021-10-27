@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -41,6 +42,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return responseEntity;
 	}
 
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<Object> handleException(AccessDeniedException exception) {
+		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new ExceptionResponse(messageService.getMsg("access.denied.error.msg"),
+						messageService.getMsg("access.denied.error.msg"), LocalDateTime.now().toString()));
+		return responseEntity;
+	}
+	
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<Object> handleException(UsernameNotFoundException exception) {
 		ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)

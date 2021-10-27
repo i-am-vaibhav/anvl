@@ -34,11 +34,11 @@ public class Course implements Serializable {
 	@GeneratedValue
 	private BigDecimal id;
 
-	@NotBlank(message = "Name must not be empty")
+	@NotBlank(message = "course.name.empty.msg")
 	@Column(name = "name")
 	private String name;
 
-	@NotBlank(message = "Description must not be empty")
+	@NotBlank(message = "course.des.empty.msg")
 	@Column(name = "description")
 	private String description;
 

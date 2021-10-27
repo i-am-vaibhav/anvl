@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,6 +71,18 @@ public class UserController {
 	@Secured(Roles.ADMIN)
 	public ResponseEntity<String> updateUser(@Validated @RequestBody User user, @PathVariable BigDecimal id) {
 		return userService.updateUser(id, user);
+	}
+	
+	@PatchMapping("/{id}/enroll/{courseName}")
+	@Secured(Roles.ADMIN)
+	public ResponseEntity<String> enrollUser(@PathVariable BigDecimal id,@PathVariable String courseName) {
+		return userService.enroll(courseName,id);
+	}
+
+	@PatchMapping("/enroll/{courseName}")
+	@Secured(Roles.USER)
+	public ResponseEntity<String> enrollUser(@PathVariable String courseName) {
+		return userService.enroll(courseName);
 	}
 
 }

@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.anvl.entities.Course;
 import com.anvl.entities.User;
+import com.anvl.repos.CourseRepository;
 import com.anvl.repos.UserRepository;
 
 /**
@@ -26,6 +29,9 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepo;
+
+	@Autowired
+	private CourseRepository courseRepo;
 
 	@Autowired
 	private MessageService messageService;
@@ -56,7 +62,7 @@ public class UserService {
 	}
 
 	private String getMessage(String property) {
-		return messageService.getMsg(property, null, LocaleContextHolder.getLocale());
+		return messageService.getMsg(property);
 	}
 
 	public ResponseEntity<Object> getUserById(BigDecimal id) {
@@ -70,12 +76,12 @@ public class UserService {
 	public ResponseEntity<String> updateUser(BigDecimal id, User user) {
 		URI location = null;
 		try {
-			Optional<User> optional = userRepo.findById(id);
+			Optional<User> userById = userRepo.findById(id);
 			User updatedUser = null;
-			if (optional.isEmpty()) {
+			if (userById.isEmpty()) {
 				return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
 			} else {
-				updatedUser = optional.get();
+				updatedUser = userById.get();
 				updatedUser.setAddress(user.getAddress());
 				updatedUser.setEmail(user.getEmail());
 				updatedUser.setUserName(user.getUserName());
@@ -90,12 +96,35 @@ public class UserService {
 	}
 
 	public ResponseEntity<Object> getCoursesByUserId(BigDecimal id) {
-		Optional<User> findByUserId = userRepo.findById(id);
-		if (findByUserId.isEmpty()) {
+		Optional<User> userById = userRepo.findById(id);
+		if (userById.isEmpty()) {
 			return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
 		}
-		User user = findByUserId.get();
+		User user = userById.get();
 		return ResponseEntity.ok(user.getCources());
+	}
+
+	public ResponseEntity<String> enroll(String courseName, BigDecimal id) {
+		Optional<User> userById = userRepo.findById(id);
+		if (userById.isEmpty()) {
+			return ResponseEntity.status(404).body(getMessage("user.not.found.exception.msg"));
+		}
+		User user = userById.get();
+		Optional<Course> courseByName = courseRepo.findByName(courseName);
+		if (courseByName.isEmpty()) {
+			return ResponseEntity.status(404).body(getMessage("course.not.found.exception.msg"));
+		}
+		List<Course> cources = user.getCources();
+		cources.add(courseByName.get());
+		user.setCources(cources);
+		userRepo.save(user);
+		return ResponseEntity.ok(messageService.getMsg("course.enroll.msg", user.getUserName(), courseName));
+	}
+
+	public ResponseEntity<String> enroll(String courseName) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Optional<User> optional = userRepo.findByUserName(authentication.getName());
+		return enroll(courseName, optional.get().getId());
 	}
 
 }
