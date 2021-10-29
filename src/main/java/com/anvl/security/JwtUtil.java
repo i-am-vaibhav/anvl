@@ -50,7 +50,7 @@ public final class JwtUtil implements Serializable {
 	public String generateToken(String subject) {
 		return Jwts.builder().setClaims(new HashMap<>()).setSubject(subject)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + tokenValidity * 60 * 60 * 1000))
+				.setExpiration(new Date(System.currentTimeMillis() + tokenValidity * 60 * 1000))
 				.signWith(SignatureAlgorithm.HS512, secretKey).compact();
 	}
 

@@ -36,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 		// JWT Token is in the form "ANVL token". Remove Bearer word and get only the
 		// Token
-		if (!request.getRequestURI().endsWith("/authenticate") && !request.getRequestURI().endsWith("/home")) {
+		if (!request.getRequestURI().endsWith("/authenticate") && !request.getRequestURI().contains("/home")) {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("ANVL ")) {
 				jwtToken = requestTokenHeader.substring(5);
 				try {
